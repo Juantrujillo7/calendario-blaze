@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Enseñanzas - Iglesia Palabra Pura</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #764ba2;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-btn.active {
+            transform: scale(1.05);
+        }
+
+        .btn-todos {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-adolescentes {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-jovenes {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-fundacion {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1em;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: scale(1.01);
+        }
+
+        .grupo-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .adolescentes {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .jovenes {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .fundacion {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .fecha {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .tema {
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .maestro {
+            color: #764ba2;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat-card {
+            padding: 20px 30px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .subtitle {
+                font-size: 1em;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9em;
+            }
+            
+            .filter-btn {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Calendario de Enseñanzas 2025</h1>
+        <p class="subtitle">Iglesia Palabra Pura - Blaze Connection</p>
+
+        <div class="stats">
+            <div class="stat-card" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <span class="stat-number">15</span>
+                <span class="stat-label">Enseñanzas</span>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Grupos</span>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                <span class="stat-number">10</span>
+                <span class="stat-label">Maestros</span>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn btn-todos active" onclick="filtrarGrupo('todos')">
+                🌟 Todos los Grupos
+            </button>
+            <button class="filter-btn btn-adolescentes" onclick="filtrarGrupo('adolescentes')">
+                🎯 Adolescentes (13-16)
+            </button>
+            <button class="filter-btn btn-jovenes" onclick="filtrarGrupo('jovenes')">
+                🚀 Jóvenes (17-27)
+            </button>
+            <button class="filter-btn btn-fundacion" onclick="filtrarGrupo('fundacion')">
+                💚 Fundación
+            </button>
+        </div>
+
+        <div class="filters" style="margin-top: 10px;">
+            <button class="filter-btn" style="background: linear-gradient(135deg, #a8edea, #fed6e3);" onclick="filtrarMaestro('todos')">
+                👥 Todos los Maestros
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);" onclick="filtrarMaestro('Juan Trujillo')">
+                👨‍🏫 Juan Trujillo
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ff9a9e, #fecfef);" onclick="filtrarMaestro('Luchito')">
+                👨‍🏫 Luchito
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #fbc2eb, #a6c1ee);" onclick="filtrarMaestro('William Sanclemente')">
+                👨‍🏫 William Sanclemente
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #fdcbf1, #e6dee9);" onclick="filtrarMaestro('Camila')">
+                👩‍🏫 Camila
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);" onclick="filtrarMaestro('Laura Martínez')">
+                👩‍🏫 Laura Martínez
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ffeaa7, #fdcb6e);" onclick="filtrarMaestro('Pastor Rafael Lemes')">
+                🎤 Pastor Rafael
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #74b9ff, #a29bfe);" onclick="filtrarMaestro('Anderson Restrepo')">
+                👨‍🏫 Anderson Restrepo
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #fab1a0, #ff7675);" onclick="filtrarMaestro('Jessica Vanegas')">
+                👩‍🏫 Jessica Vanegas
+            </button>
+        </div>
+
+        <!-- Botón para mostrar/ocultar filtros de temas -->
+        <div style="text-align: center; margin-top: 15px;">
+            <button class="filter-btn" style="background: linear-gradient(135deg, #667eea, #764ba2); font-size: 1.1em; padding: 14px 30px;" onclick="toggleFiltrosTemas()">
+                📚 Filtrar por Temas ▼
+            </button>
+        </div>
+
+        <!-- Filtros de temas (ocultos por defecto) -->
+        <div id="filtrosTemas" class="filters" style="margin-top: 10px; display: none;">
+            <button class="filter-btn" style="background: linear-gradient(135deg, #d299c2, #fef9d7);" onclick="filtrarTema('todos')">
+                📚 Todos los Temas
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #fa709a, #fee140);" onclick="filtrarTema('Apertura')">
+                🎉 Apertura
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ff0844, #ffb199);" onclick="filtrarTema('Que No Se Te Queme La Carne')">
+                🔥 Control de la Carne
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #30cfd0, #330867);" onclick="filtrarTema('Lógica de Dios')">
+                🧠 Lógica de Dios
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #efd5ff, #515ada);" onclick="filtrarTema('Predesafío')">
+                ⚡ Predesafío
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ffa585, #ffeda0);" onclick="filtrarTema('Follow Me')">
+                🔥 Follow Me
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #89f7fe, #66a6ff);" onclick="filtrarTema('Postdesafío')">
+                🎯 Postdesafío
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #a8caba, #5d4e6d);" onclick="filtrarTema('Honrar a Israel')">
+                🇮🇱 Honrar a Israel
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #f83600, #f9d423);" onclick="filtrarTema('Adicciones')">
+                ⚠️ Adicciones
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #0ba360, #3cba92);" onclick="filtrarTema('Sanamente')">
+                💚 Sanamente
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ff6a88, #ff99ac);" onclick="filtrarTema('Amor Real')">
+                ❤️ Amor Real
+            </button>
+            <button class="filter-btn" style="background: linear-gradient(135deg, #ffd89b, #19547b);" onclick="filtrarTema('Gran Cierre')">
+                🎊 Gran Cierre
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table id="calendario">
+                <thead>
+                    <tr>
+                        <th>📆 Fecha</th>
+                        <th>📚 Tema</th>
+                        <th>👨‍🏫 Maestro/a</th>
+                        <th>👥 Grupo</th>
+                        <th>🎂 Edades</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Febrero 14 - APERTURA DEL AÑO -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">14 Feb</td>
+                        <td class="tema">🎉 Reunión de Apertura del Año</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- SERIE: QUE NO SE TE QUEME LA CARNE (3 fechas) -->
+                    <!-- Marzo 7 -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">7 Mar</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #1</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">7 Mar</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #1</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">7 Mar</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #1</td>
+                        <td class="maestro">William Sanclemente</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Marzo 28 -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">28 Mar</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #2</td>
+                        <td class="maestro">Pastor Rafael Lemes</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- Abril 18 -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">18 Abr</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #3</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">18 Abr</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #3</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">18 Abr</td>
+                        <td class="tema">🔥 Que No Se Te Queme La Carne #3</td>
+                        <td class="maestro">William Sanclemente</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- SERIE: LA LÓGICA DE DIOS (3 fechas) -->
+                    <!-- Mayo 2 -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">2 May</td>
+                        <td class="tema">🧠 La Lógica de Dios #1</td>
+                        <td class="maestro">Camila Gómez</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">2 May</td>
+                        <td class="tema">🧠 La Lógica de Dios #1</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">2 May</td>
+                        <td class="tema">🧠 La Lógica de Dios #1</td>
+                        <td class="maestro">William Sanclemente</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Mayo 23 -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">23 May</td>
+                        <td class="tema">🧠 La Lógica de Dios #2</td>
+                        <td class="maestro">Laura Martínez</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">23 May</td>
+                        <td class="tema">🧠 La Lógica de Dios #2</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">23 May</td>
+                        <td class="tema">🧠 La Lógica de Dios #2</td>
+                        <td class="maestro">Camila</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Junio 13 - PREDESAFÍO -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">13 Jun</td>
+                        <td class="tema">⚡ Predesafío</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- Junio 15 - DESAFÍO "FOLLOW ME" -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">15 Jun</td>
+                        <td class="tema">🔥 Desafío "Follow Me"</td>
+                        <td class="maestro">Todo el Equipo</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- Julio 4 - POSTDESAFÍO -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">4 Jul</td>
+                        <td class="tema">🎯 Postdesafío</td>
+                        <td class="maestro">Pastor Rafael Lemes</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- Agosto 1 - HONRAR A ISRAEL -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">1 Ago</td>
+                        <td class="tema">🇮🇱 Honrar a Israel</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- SERIE: ADICCIONES (3 semanas) -->
+                    <!-- Agosto 22 - Pornografía -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">22 Ago</td>
+                        <td class="tema">⚠️ Adicciones: Pornografía</td>
+                        <td class="maestro">William Sanclemente</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">22 Ago</td>
+                        <td class="tema">⚠️ Adicciones: Pornografía</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">22 Ago</td>
+                        <td class="tema">⚠️ Adicciones: Pornografía</td>
+                        <td class="maestro">Laura Martínez</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Septiembre 12 - AMOR REAL (Podcast) -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">12 Sep</td>
+                        <td class="tema">❤️ Amor Real (Formato Podcast)</td>
+                        <td class="maestro">Todo el Equipo</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+
+                    <!-- Octubre 3 - Drogas (movido desde septiembre) -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">3 Oct</td>
+                        <td class="tema">⚠️ Adicciones: Drogas</td>
+                        <td class="maestro">Anderson Restrepo</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">3 Oct</td>
+                        <td class="tema">⚠️ Adicciones: Drogas</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">3 Oct</td>
+                        <td class="tema">⚠️ Adicciones: Drogas</td>
+                        <td class="maestro">William Sanclemente</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Octubre 24 - SANAMENTE -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">24 Oct</td>
+                        <td class="tema">💚 Sanamente - Contra la Ansiedad</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">24 Oct</td>
+                        <td class="tema">💚 Sanamente - Contra la Ansiedad</td>
+                        <td class="maestro">Jessica Vanegas</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">24 Oct</td>
+                        <td class="tema">💚 Sanamente - Contra la Ansiedad</td>
+                        <td class="maestro">Laura Martínez</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Noviembre 14 - Adicciones Inesperadas (movido desde octubre) -->
+                    <tr class="row-adolescentes" data-grupo="adolescentes">
+                        <td class="fecha">14 Nov</td>
+                        <td class="tema">⚠️ Adicciones Inesperadas</td>
+                        <td class="maestro">Juan Trujillo</td>
+                        <td><span class="grupo-badge adolescentes">Adolescentes</span></td>
+                        <td>13-16 años</td>
+                    </tr>
+                    <tr class="row-jovenes" data-grupo="jovenes">
+                        <td class="fecha">14 Nov</td>
+                        <td class="tema">⚠️ Adicciones Inesperadas</td>
+                        <td class="maestro">Luchito</td>
+                        <td><span class="grupo-badge jovenes">Jóvenes</span></td>
+                        <td>17-27 años</td>
+                    </tr>
+                    <tr class="row-fundacion" data-grupo="fundacion">
+                        <td class="fecha">14 Nov</td>
+                        <td class="tema">⚠️ Adicciones Inesperadas</td>
+                        <td class="maestro">William Sanclemente</td>
+                        <td><span class="grupo-badge fundacion">Fundación</span></td>
+                        <td>Niñas</td>
+                    </tr>
+
+                    <!-- Noviembre 28 - GRAN CIERRE -->
+                    <tr class="row-general" data-grupo="todos">
+                        <td class="fecha">28 Nov</td>
+                        <td class="tema">🎊 Gran Cierre del Año</td>
+                        <td class="maestro">Todo el Equipo</td>
+                        <td><span class="grupo-badge" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">General - 3 Grupos</span></td>
+                        <td>Todos</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function filtrarGrupo(grupo) {
+            const rows = document.querySelectorAll('tbody tr');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Remover clase active de todos los botones
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Agregar clase active al botón clickeado
+            if (grupo === 'todos') {
+                document.querySelector('.btn-todos').classList.add('active');
+            } else if (grupo === 'adolescentes') {
+                document.querySelector('.btn-adolescentes').classList.add('active');
+            } else if (grupo === 'jovenes') {
+                document.querySelector('.btn-jovenes').classList.add('active');
+            } else if (grupo === 'fundacion') {
+                document.querySelector('.btn-fundacion').classList.add('active');
+            }
+            
+            // Mostrar/ocultar filas
+            rows.forEach(row => {
+                if (grupo === 'todos') {
+                    row.classList.remove('hidden');
+                } else {
+                    const dataGrupo = row.dataset.grupo;
+                    // Mostrar filas generales siempre, o las del grupo específico
+                    if (dataGrupo === 'todos' || dataGrupo === grupo) {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        function filtrarMaestro(maestro) {
+            const rows = document.querySelectorAll('tbody tr');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Remover clase active de todos los botones
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Marcar el botón clickeado
+            event.target.classList.add('active');
+            
+            // Mostrar/ocultar filas según el maestro
+            rows.forEach(row => {
+                const maestroCell = row.querySelector('.maestro');
+                if (maestro === 'todos' || maestroCell.textContent.includes(maestro)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        function filtrarTema(tema) {
+            const rows = document.querySelectorAll('tbody tr');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Remover clase active de todos los botones
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Marcar el botón clickeado
+            event.target.classList.add('active');
+            
+            // Mostrar/ocultar filas según el tema
+            rows.forEach(row => {
+                const temaCell = row.querySelector('.tema');
+                if (tema === 'todos' || temaCell.textContent.includes(tema)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleFiltrosTemas() {
+            const filtrosTemas = document.getElementById('filtrosTemas');
+            const btnToggle = event.target;
+            
+            if (filtrosTemas.style.display === 'none' || filtrosTemas.style.display === '') {
+                filtrosTemas.style.display = 'flex';
+                btnToggle.innerHTML = '📚 Ocultar Filtros de Temas ▲';
+            } else {
+                filtrosTemas.style.display = 'none';
+                btnToggle.innerHTML = '📚 Filtrar por Temas ▼';
+            }
+        }
+
+        // Agregar animación de entrada
+        window.addEventListener('load', () => {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                setTimeout(() => {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(-20px)';
+                    row.style.transition = 'all 0.3s ease';
+                    setTimeout(() => {
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateX(0)';
+                    }, 50);
+                }, index * 30);
+            });
+        });
+    </script>
+</body>
+</html>
